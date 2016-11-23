@@ -1,23 +1,28 @@
 {
-    "name": "latrell/alipay",
-    "description": "支付宝SDK在Laravel5封装包。",
+    "name": "kevinzheng/laravel-alipay",
+    "description": "Alipay SDK for Laravel",
     "keywords": ["L5", "Laravel 5", "Laravel", "Alipay", "Alipay SDK"],
     "license": "MIT",
+    "homepage": "https://github.com/kevinzheng/laravel-alipay",
+    "support": {
+        "issues": "https://github.com/kevinzheng/laravel-alipay/issues",
+        "source": "https://github.com/kevinzheng/laravel-alipay"
+    },
     "authors": [
         {
-            "name": "Latrell Chan",
-            "email": "i@latrell.me"
+            "name": "Kevin Zheng",
+            "email": "realkvz@gmail.com"
         }
     ],
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.6.0",
         "illuminate/support": "5.*",
         "illuminate/events": "5.*",
         "illuminate/config": "5.*"
     },
     "autoload": {
         "psr-4": {
-            "Latrell\\Alipay\\": "src/Latrell/Alipay/"
+            "KVZ\\Laravel\\Alipay\\": "src/"
         }
     },
     "minimum-stability": "stable"

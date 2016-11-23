@@ -1,28 +1,30 @@
 <?php
-namespace Latrell\Alipay\Wap;
+namespace KVZ\Laravel\Alipay\Mobile;
 
 class SdkPayment
 {
-
-	private $__gateway_new = 'https://mapi.alipay.com/gateway.do?';
 
 	private $__https_verify_url = 'https://mapi.alipay.com/gateway.do?service=notify_verify&';
 
 	private $__http_verify_url = 'http://notify.alipay.com/trade/notify_query.do?';
 
-	private $service = 'alipay.wap.create.direct.pay.by.user';
+	private $service = 'mobile.securitypay.pay';
 
 	private $partner;
 
 	private $_input_charset = 'UTF-8';
 
-	private $sign_type = 'MD5';
+	private $sign_type = 'RSA';
+
+	private $private_key_path;
+
+	private $public_key_path;
 
 	private $notify_url;
 
-	private $return_url;
-
 	private $out_trade_no;
+
+	private $subject;
 
 	private $payment_type = 1;
 
@@ -30,17 +32,15 @@ class SdkPayment
 
 	private $total_fee;
 
-	private $subject;
-
 	private $body;
 
 	private $it_b_pay;
 
 	private $show_url;
 
-	private $exter_invoke_ip;
+	private $anti_phishing_key;
 
-	private $app_pay = 'Y';
+	private $exter_invoke_ip;
 
 	private $key;
 
@@ -50,20 +50,19 @@ class SdkPayment
 
 	public function __construct()
 	{
-		$this->cacert = getcwd() . DIRECTORY_SEPARATOR . 'cacert.pem';
+		$this->cacert = getcwd() . DIRECTORY_SEPARATOR .'cacert.pem';
 	}
 
 	/**
-	 * 取得支付链接
+	 * 取得支付链接参数
 	 */
-	public function getPayLink()
+	public function getPayPara()
 	{
 		$parameter = array(
 			'service' => $this->service,
-			'partner' => $this->partner,
+			'partner' => trim($this->partner),
 			'payment_type' => $this->payment_type,
 			'notify_url' => $this->notify_url,
-			'return_url' => $this->return_url,
 			'seller_id' => $this->seller_id,
 			'out_trade_no' => $this->out_trade_no,
 			'subject' => $this->subject,
@@ -71,14 +70,14 @@ class SdkPayment
 			'body' => $this->body,
 			'it_b_pay' => $this->it_b_pay,
 			'show_url' => $this->show_url,
+			'anti_phishing_key' => $this->anti_phishing_key,
 			'exter_invoke_ip' => $this->exter_invoke_ip,
-			'app_pay' => $this->app_pay,
-			'_input_charset' => strtolower($this->_input_charset)
+			'_input_charset' => trim(strtolower($this->_input_charset))
 		);
 
 		$para = $this->buildRequestPara($parameter);
 
-		return $this->__gateway_new . $this->createLinkstringUrlencode($para);
+		return $this->createLinkstringUrlencode($para);
 	}
 
 	/**
@@ -91,7 +90,7 @@ class SdkPayment
 			return false;
 		}
 
-		$data = $_POST ?: $_GET;
+		$data = $_POST ?  : $_GET;
 
 		// 生成签名结果
 		$is_sign = $this->getSignVeryfy($data, $data['sign']);
@@ -112,54 +111,6 @@ class SdkPayment
 		}
 	}
 
-	public function setPartner($partner)
-	{
-		$this->partner = $partner;
-		return $this;
-	}
-
-	public function setNotifyUrl($notify_url)
-	{
-		$this->notify_url = $notify_url;
-		return $this;
-	}
-
-	public function setReturnUrl($return_url)
-	{
-		$this->return_url = $return_url;
-		return $this;
-	}
-
-	public function setOutTradeNo($out_trade_no)
-	{
-		$this->out_trade_no = $out_trade_no;
-		return $this;
-	}
-
-	public function setKey($key)
-	{
-		$this->key = $key;
-		return $this;
-	}
-
-	public function setSellerId($seller_id)
-	{
-		$this->seller_id = $seller_id;
-		return $this;
-	}
-
-	public function setTotalFee($total_fee)
-	{
-		$this->total_fee = $total_fee;
-		return $this;
-	}
-
-	public function setSubject($subject)
-	{
-		$this->subject = $subject;
-		return $this;
-	}
-
 	public function setBody($body)
 	{
 		$this->body = $body;
@@ -172,27 +123,57 @@ class SdkPayment
 		return $this;
 	}
 
-	public function setShowUrl($show_url)
+	public function setNotifyUrl($notify_url)
 	{
-		$this->show_url = $show_url;
+		$this->notify_url = $notify_url;
+		return $this;
+	}
+
+	public function setOutTradeNo($out_trade_no)
+	{
+		$this->out_trade_no = $out_trade_no;
+		return $this;
+	}
+
+	public function setPartner($partner)
+	{
+		$this->partner = $partner;
+		return $this;
+	}
+
+	public function setPrivateKeyPath($private_key_path)
+	{
+		$this->private_key_path = $private_key_path;
+		return $this;
+	}
+
+	public function setPublicKeyPath($public_key_path)
+	{
+		$this->public_key_path = $public_key_path;
+		return $this;
+	}
+
+	public function setSellerId($seller_id)
+	{
+		$this->seller_id = $seller_id;
+		return $this;
+	}
+
+	public function setSubject($subject)
+	{
+		$this->subject = $subject;
+		return $this;
+	}
+
+	public function setTotalFee($total_fee)
+	{
+		$this->total_fee = $total_fee;
 		return $this;
 	}
 
 	public function setSignType($sign_type)
 	{
 		$this->sign_type = $sign_type;
-		return $this;
-	}
-
-	public function setExterInvokeIp($exter_invoke_ip)
-	{
-		$this->exter_invoke_ip = $exter_invoke_ip;
-		return $this;
-	}
-
-	public function setAppPay($app_pay)
-	{
-		$this->app_pay = $app_pay;
 		return $this;
 	}
 
@@ -226,6 +207,63 @@ class SdkPayment
 	}
 
 	/**
+	 * 生成签名结果
+	 * @param $para_sort 已排序要签名的数组
+	 * return 签名结果字符串
+	 */
+	private function buildRequestMysign($para_sort)
+	{
+		//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+		$prestr = $this->createLinkstring($para_sort);
+
+		$mysign = '';
+		switch (strtoupper(trim($this->sign_type))) {
+			case 'MD5':
+				$mysign = $this->md5Sign($prestr, $this->key);
+				break;
+			case 'RSA':
+				$mysign = $this->rsaSign($prestr, trim($this->private_key_path));
+				break;
+			default:
+				$mysign = '';
+		}
+
+		return $mysign;
+	}
+
+	/**
+	 * 获取返回时的签名验证结果
+	 * @param $para_temp 通知返回来的参数数组
+	 * @param $sign 返回的签名结果
+	 * @return 签名验证结果
+	 */
+	function getSignVeryfy($para_temp, $sign)
+	{
+		//除去待签名参数数组中的空值和签名参数
+		$para_filter = $this->paraFilter($para_temp);
+
+		//对待签名参数数组排序
+		$para_sort = $this->argSort($para_filter);
+
+		//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+		$prestr = $this->createLinkstring($para_sort);
+
+		$is_sgin = false;
+		switch (strtoupper(trim($this->sign_type))) {
+			case 'MD5':
+				$is_sgin = $this->md5Verify($prestr, $sign, $this->key);
+				break;
+			case 'RSA':
+				$is_sgin = $this->rsaVerify($prestr, $this->public_key_path, $sign);
+				break;
+			default:
+				$is_sgin = false;
+		}
+
+		return $is_sgin;
+	}
+
+	/**
 	 * 除去数组中的空值和签名参数
 	 * @param $para 签名参数组
 	 * return 去掉空值与签名参数后的新签名参数组
@@ -256,25 +294,36 @@ class SdkPayment
 	}
 
 	/**
-	 * 生成签名结果
-	 * @param $para_sort 已排序要签名的数组
-	 * return 签名结果字符串
+	 * RSA验签
+	 * @param $data 待签名数据
+	 * @param $ali_public_key_path 支付宝的公钥文件路径
+	 * @param $sign 要校对的的签名结果
+	 * return 验证结果
 	 */
-	private function buildRequestMysign($para_sort)
+	private function rsaVerify($data, $public_key_path, $sign)
 	{
-		//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
-		$prestr = $this->createLinkstring($para_sort);
+		$pubKey = file_get_contents($public_key_path);
+		$res = openssl_get_publickey($pubKey);
+		$result = (bool) openssl_verify($data, base64_decode($sign), $res);
+		openssl_free_key($res);
+		return $result;
+	}
 
-		$mysign = '';
-		switch (strtoupper(trim($this->sign_type))) {
-			case 'MD5':
-				$mysign = $this->md5Sign($prestr, $this->key);
-				break;
-			default:
-				$mysign = '';
-		}
-
-		return $mysign;
+	/**
+	 * RSA签名
+	 * @param $data 待签名数据
+	 * @param $private_key_path 商户私钥文件路径
+	 * return 签名结果
+	 */
+	private function rsaSign($data, $private_key_path)
+	{
+		$priKey = file_get_contents($private_key_path);
+		$res = openssl_get_privatekey($priKey);
+		openssl_sign($data, $sign, $res);
+		openssl_free_key($res);
+		//base64编码
+		$sign = base64_encode($sign);
+		return $sign;
 	}
 
 	/**
@@ -319,66 +368,6 @@ class SdkPayment
 		}
 
 		return $arg;
-	}
-
-	/**
-	 * 签名字符串
-	 * @param $prestr 需要签名的字符串
-	 * @param $key 私钥
-	 * return 签名结果
-	 */
-	private function md5Sign($prestr, $key)
-	{
-		$prestr = $prestr . $key;
-		return md5($prestr);
-	}
-
-	/**
-	 * 验证签名
-	 * @param $prestr 需要签名的字符串
-	 * @param $sign 签名结果
-	 * @param $key 私钥
-	 * return 签名结果
-	 */
-	private function md5Verify($prestr, $sign, $key)
-	{
-		$prestr = $prestr . $key;
-		$mysgin = md5($prestr);
-
-		if ($mysgin == $sign) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * 获取返回时的签名验证结果
-	 * @param $para_temp 通知返回来的参数数组
-	 * @param $sign 返回的签名结果
-	 * @return 签名验证结果
-	 */
-	private function getSignVeryfy($para_temp, $sign)
-	{
-		//除去待签名参数数组中的空值和签名参数
-		$para_filter = $this->paraFilter($para_temp);
-
-		//对待签名参数数组排序
-		$para_sort = $this->argSort($para_filter);
-
-		//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
-		$prestr = $this->createLinkstring($para_sort);
-
-		$is_sgin = false;
-		switch (strtoupper(trim($this->sign_type))) {
-			case 'MD5':
-				$is_sgin = $this->md5Verify($prestr, $sign, $this->key);
-				break;
-			default:
-				$is_sgin = false;
-		}
-
-		return $is_sgin;
 	}
 
 	/**

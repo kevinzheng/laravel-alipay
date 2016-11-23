@@ -1,5 +1,5 @@
 <?php
-namespace Latrell\Alipay;
+namespace KVZ\Laravel\Alipay;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Application as LaravelApplication;
@@ -23,9 +23,9 @@ class AlipayServiceProvider extends ServiceProvider
 	 */
 	protected function setupConfig()
 	{
-		$source_config = realpath(__DIR__ . '/../../config/config.php');
-		$source_mobile = realpath(__DIR__ . '/../../config/mobile.php');
-		$source_web = realpath(__DIR__ . '/../../config/web.php');
+		$source_config = realpath(__DIR__ . '/../config/config.php');
+		$source_mobile = realpath(__DIR__ . '/../config/mobile.php');
+		$source_web = realpath(__DIR__ . '/../config/web.php');
 		if ($this->app instanceof LaravelApplication && $this->app->runningInConsole()) {
 			$this->publishes([
 				$source_config => config_path('latrell-alipay.php'),

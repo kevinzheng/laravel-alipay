@@ -1,10 +1,10 @@
 <?php
 
-namespace Latrell\Alipay\Facades;
+namespace KVZ\Laravel\Alipay\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class AlipayMobile extends Facade
+class AlipayWeb extends Facade
 {
 
 	/**
@@ -14,6 +14,6 @@ class AlipayMobile extends Facade
 	 */
 	protected static function getFacadeAccessor()
 	{
-		return 'alipay.mobile';
+		return 'alipay.web';
 	}
 }
