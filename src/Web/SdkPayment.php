@@ -1,5 +1,5 @@
 <?php
-namespace KVZ\Laravel\Laravel\Alipay\Web;
+namespace KVZ\Laravel\Alipay\Web;
 
 class SdkPayment
 {
